@@ -7,8 +7,11 @@
 int factorielle(int x){
   int res;
   if(x == 0) return 0;
+  if(x == 1) return 1;
+  res =x ;
+  x = x-1;
   while(x > 1){
-    res *= (x-1);
+    res = res *x;
     x = x-1;
   }
   return res;
