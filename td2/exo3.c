@@ -45,10 +45,27 @@ Liste ajout_fin (Liste l, int v) {
 	return tmp;
 }
 
+Liste ajout_fin_recursif (Liste l, int v) {
+	if (test_liste_vide(l)) return ajout_debut(l,v);
+	else {
+		l->suivant = ajout_fin_recursif (l->suivant,v);
+		return l;
+	}
+}
+
 int test_trie (Liste l){
 	if (l == NULL) return 1;
 	if (l->val > (l->suivant)->val) return 0;
 	else return test_trie(l->suivant);
+}
+
+Liste ajout_trie_recursif (Liste l, int v) {
+	if (test_trie(l)) {
+		if (test_liste_vide(l) || v<= l->val) return ajout_debut(l,v);
+		l->suivant = ajout_trie_recursif (l->suivant,v);
+		return l;
+	}
+	else return ajout_debut (l,v);
 }
 
 Liste ajout_trie(Liste l,int v) {
@@ -65,15 +82,41 @@ Liste ajout_trie(Liste l,int v) {
 	else return ajout_debut(l,v);
 }
 
+int alea (int n) {
+	int a; 
+	a= rand()%(n+1);
+	return a;
+}
+
+Liste init_liste_alea_debut (Liste l, int n){
+	int v;
+	while ((v=alea (n))!= 0){
+		l = ajout_debut (l,v);
+	}
+	return l ;
+}
+
+Liste init_liste_alea_fin (Liste l, int n) {
+	int v;
+	while ((v=alea (n))!= 0){
+		l = ajout_fin_recursif (l,v);
+	}
+	return l ;
+}
+
+Liste init_liste_alea_trie (Liste l, int n) {
+	int v;
+	while ((v=alea (n))!= 0){
+		l = ajout_trie (l,v);
+	}
+	return l ;
+}
+
 int main () {
+	srand(time(NULL));
 	Liste liste;
-	liste = init_liste_vide();
+	liste= init_liste_vide ();
+	liste = init_liste_alea_trie(liste, 20);
 	affiche_liste (liste);
-	liste = ajout_debut(liste, 2);
-	affiche_liste (liste);
-	liste = ajout_fin (liste, 6);
-	affiche_liste(liste);
-	liste = ajout_trie (liste, 1);
-	affiche_liste(liste);
 	return 0;
 }
