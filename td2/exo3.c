@@ -108,7 +108,7 @@ Liste alea_liste (int n) {
 	Liste l = init_liste_vide ();
 	int v; 
 	while ((v=alea (n))!=0){
-		l = ajout_trie_recursif (l,v);
+		l = ajout_debut (l,v);
 	}
 	return l;
 }
@@ -172,20 +172,45 @@ Liste concat_liste (Liste l1, Liste l2) {
   } */
 
 Liste concat_liste_trie (Liste l1, Liste l2) {
-	Liste tmp;
 	if (test_trie (l1)) {
 		while (l2!=NULL) {
 			ajout_trie_recursif (l1, l2->val);
-			tmp = l2;
 			l2 = l2->suivant;
-			free (tmp);
 		}
 	}
 	return l1;
 }
 
 Liste tri_bulle (Liste l) {
-	
+	int cont = 1;
+	Liste tmp = l;
+	int bascule;
+	while (cont) {
+		cont=0;
+		while (!test_liste_vide(l) && !test_liste_vide(l->suivant)){
+			if ( l->val > l->suivant->val){
+				bascule = l->val;
+				l->val = l->suivant->val;
+				l->suivant->val= bascule;
+				cont = 1;
+			}
+			l = l->suivant;
+		}
+		l=tmp;
+	}
+	return tmp;
+}
+
+Liste renverser_liste (Liste l) {
+	Liste res = init_liste_vide ();
+	Liste tmp;
+	while (!test_liste_vide(l)){
+		res = ajout_debut (res, l->val);
+		tmp = l;
+		l = l->suivant;
+		free(tmp);
+	}
+	return res;
 }
 
 int main () {
@@ -194,13 +219,16 @@ int main () {
 	Liste liste2 = alea_liste(10);
 	affiche_liste (liste);
 	printf ( "La liste contient %d elements \n", nombre_element(liste));
-	printf (  "La liste contient 9 = %d \n", recherche_element (liste, 9));
+	printf (  "La liste contient 3 = %d \n", recherche_element (liste, 3));
 	liste = suppr_element (liste, 3);
 	affiche_liste (liste);
-	affiche_liste (liste2);
+	liste = tri_bulle (liste);
+	affiche_liste (liste);
 	printf ( "La liste contient %d elements \n", nombre_element(liste2));
 	liste = concat_liste_trie (liste, liste2);
 	affiche_liste (liste);
 	printf ( "La liste contient %d elements \n", nombre_element(liste));
+	liste = renverser_liste(liste);
+	affiche_liste (liste);
 	return 0;
 }
