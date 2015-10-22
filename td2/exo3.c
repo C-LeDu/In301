@@ -54,7 +54,7 @@ Liste ajout_fin_recursif (Liste l, int v) {
 }
 
 int test_trie (Liste l){
-	if (l == NULL) return 1;
+	if (l == NULL || l->suivant == NULL) return 1;
 	if (l->val > (l->suivant)->val) return 0;
 	else return test_trie(l->suivant);
 }
@@ -68,7 +68,7 @@ Liste ajout_trie_recursif (Liste l, int v) {
 	else return ajout_debut (l,v);
 }
 
-Liste ajout_trie(Liste l,int v) {
+/*Liste ajout_trie(Liste l,int v) {
 	if (test_trie (l)){
 		Liste tmp = l;
 		Element* elt = malloc(sizeof(Element));
@@ -80,7 +80,7 @@ Liste ajout_trie(Liste l,int v) {
 		return tmp;
 	}
 	else return ajout_debut(l,v);
-}
+}*/
 
 int alea (int n) {
 	int a; 
@@ -88,35 +88,119 @@ int alea (int n) {
 	return a;
 }
 
-Liste init_liste_alea_debut (Liste l, int n){
+
+void test_liste (int n) {
+	Liste l1 = NULL;
+	Liste l2 = NULL;
+	Liste l3 = NULL;
 	int v;
-	while ((v=alea (n))!= 0){
-		l = ajout_debut (l,v);
+	while ((v=alea (n))!=0){
+		l1 = ajout_debut (l1,v);
+		l2 = ajout_fin (l2,v);
+		l3 = ajout_trie_recursif (l3,v);
 	}
-	return l ;
+	affiche_liste(l1);
+	affiche_liste(l2);
+	affiche_liste(l3);
 }
 
-Liste init_liste_alea_fin (Liste l, int n) {
-	int v;
-	while ((v=alea (n))!= 0){
-		l = ajout_fin_recursif (l,v);
+Liste alea_liste (int n) {
+	Liste l = init_liste_vide ();
+	int v; 
+	while ((v=alea (n))!=0){
+		l = ajout_trie_recursif (l,v);
 	}
-	return l ;
+	return l;
 }
 
-Liste init_liste_alea_trie (Liste l, int n) {
-	int v;
-	while ((v=alea (n))!= 0){
-		l = ajout_trie (l,v);
+int nombre_element(Liste l) {
+	if (test_liste_vide(l)) return 0;
+	return 1+nombre_element(l->suivant);
+}
+
+int recherche_element (Liste l, int v) {
+	while (l!=NULL) {
+		if (l->val == v) return 1;
+		l = l->suivant;
 	}
-	return l ;
+	return 0;
+}
+
+/*Liste suppr_element (Liste l, int v) {  // ici on suprime uniquement le premier element de la liste egal a v
+	Liste tmp = l;
+	Liste suppr =init_liste_vide ();
+	if (test_liste_vide(l) || recherche_element (l,v) ==0) return l;
+	if (l->val ==v) {
+		suppr = l;
+		l = l->suivant;
+		free (suppr);
+		return l;
+		}
+	while (l->suivant->val != v) {
+		l = l->suivant;
+	}
+	suppr = l->suivant;
+	l->suivant = l->suivant->suivant;
+	free (suppr);
+	return tmp;
+}*/
+
+Liste suppr_element (Liste l,int v) { //ici on supprime TOUT les elmt de la liste egal à v
+	Liste tmp;
+	if (test_liste_vide (l)) return l;
+	l->suivant = suppr_element (l->suivant, v);
+	if ( l->val == v) {
+		tmp = l->suivant;
+		free (l);
+		l=tmp;
+	}
+	return l;
+}
+
+Liste concat_liste (Liste l1, Liste l2) {
+	Liste tmp = l1; 
+	if (l1==NULL) return l2;
+	while (l1->suivant != NULL) l1 = l1->suivant;
+	l1->suivant = l2;
+	return tmp;
+}
+
+/*Liste concat_liste (Liste l1, Liste l2) {
+	if (test_liste_vie (l1)) return l2;
+	l1->suivant = concat_liste (l1->suivant, l2);
+	return l2;
+  } */
+
+Liste concat_liste_trie (Liste l1, Liste l2) {
+	Liste tmp;
+	if (test_trie (l1)) {
+		while (l2!=NULL) {
+			ajout_trie_recursif (l1, l2->val);
+			tmp = l2;
+			l2 = l2->suivant;
+			free (tmp);
+		}
+	}
+	return l1;
+}
+
+Liste tri_bulle (Liste l) {
+	
 }
 
 int main () {
 	srand(time(NULL));
-	Liste liste;
-	liste= init_liste_vide ();
-	liste = init_liste_alea_trie(liste, 20);
+	Liste liste = alea_liste (10);
+	Liste liste2 = alea_liste(10);
 	affiche_liste (liste);
+	printf ( "La liste contient %d elements \n", nombre_element(liste));
+	printf (  "La liste contient 9 = %d \n", recherche_element (liste, 9));
+	liste = suppr_element (liste, 3);
+	affiche_liste (liste);
+	affiche_liste (liste2);
+	printf ( "La liste contient %d elements \n", nombre_element(liste2));
+	liste = concat_liste_trie (liste, liste2);
+	affiche_liste (liste);
+	printf ( "La liste contient %d elements \n", nombre_element(liste));
 	return 0;
 }
